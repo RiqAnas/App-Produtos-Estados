@@ -1,4 +1,6 @@
+import 'package:appprodutosestados/Models/cart.dart';
 import 'package:appprodutosestados/Models/productList.dart';
+import 'package:appprodutosestados/Pages/cartPage.dart';
 import 'package:appprodutosestados/Pages/productDetailPage.dart';
 import 'package:appprodutosestados/Pages/productsOverviewPage.dart';
 
@@ -18,8 +20,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     //Envolver o materialApp com o CNP para conseguir pegar os dados em qualquer local
     //criando e passando uma nova classe
-    return ChangeNotifierProvider(
-      create: (_) => ProductList(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ProductList()),
+        ChangeNotifierProvider(create: (_) => Cart()),
+      ],
       child: MaterialApp(
         title: "app Loja",
         theme: ThemeData(
@@ -31,6 +36,7 @@ class MyApp extends StatelessWidget {
         routes: {
           Approutes.HOME: (ctx) => Productsoverviewpage(),
           Approutes.ITEMPRODUCT: (ctx) => Productdetailpage(),
+          Approutes.CART: (ctx) => Cartpage(),
         },
       ),
     );

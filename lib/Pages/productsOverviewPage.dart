@@ -1,5 +1,9 @@
 import 'package:appprodutosestados/Components/productsGrid.dart';
+import 'package:appprodutosestados/Components/quantBadge.dart';
+import 'package:appprodutosestados/Models/cart.dart';
+import 'package:appprodutosestados/Utils/appRoutes.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 enum Filtereds { Favorites, All }
 
@@ -33,6 +37,19 @@ class _ProductsoverviewpageState extends State<Productsoverviewpage> {
                 }
               });
             },
+          ),
+          Consumer<Cart>(
+            child: IconButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed(Approutes.CART);
+              },
+              icon: Icon(Icons.shopping_cart),
+            ),
+            builder: (ctx, cart, child) => Quantbadge(
+              value: cart.itemsCount.toString(),
+              child: child!,
+              exists: cart.items.isEmpty,
+            ),
           ),
         ],
         title: Text("Lojinha"),

@@ -1,3 +1,4 @@
+import 'package:appprodutosestados/Models/cart.dart';
 import 'package:appprodutosestados/Models/product.dart';
 import 'package:appprodutosestados/Utils/appRoutes.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ class Itemproduct extends StatelessWidget {
     //(ou seja não irá mudar o ícone), o false é bom para dados imutáveis
 
     final product = Provider.of<Product>(context, listen: false);
+    final cart = Provider.of<Cart>(context, listen: false);
 
     return ClipRRect(
       borderRadius: BorderRadiusGeometry.circular(10),
@@ -31,7 +33,9 @@ class Itemproduct extends StatelessWidget {
             ),
           ),
           trailing: IconButton(
-            onPressed: () {},
+            onPressed: () {
+              cart.addItem(product);
+            },
             icon: Icon(Icons.shopping_cart),
           ),
         ),

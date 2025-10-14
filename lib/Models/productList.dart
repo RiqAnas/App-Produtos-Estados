@@ -21,6 +21,11 @@ class ProductList with ChangeNotifier {
     notifyListeners();
   }
 
+  String productUrlById(String id) {
+    final filteredProduct = _items.firstWhere((product) => product.id == id);
+    return filteredProduct.imageUrl!;
+  }
+
   /*Forma Global
 
   bool _showFavoriteOnly = false;
