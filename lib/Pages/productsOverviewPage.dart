@@ -1,3 +1,4 @@
+import 'package:appprodutosestados/Components/appDrawer.dart';
 import 'package:appprodutosestados/Components/productsGrid.dart';
 import 'package:appprodutosestados/Components/quantBadge.dart';
 import 'package:appprodutosestados/Models/cart.dart';
@@ -57,6 +58,7 @@ class _ProductsoverviewpageState extends State<Productsoverviewpage> {
         backgroundColor: Theme.of(context).primaryColor,
       ),
       body: productsGrid(favoriteOnly: _showFavoriteOnly),
+      drawer: Appdrawer(),
     );
   }
 }

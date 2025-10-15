@@ -1,5 +1,6 @@
 import 'package:appprodutosestados/Components/cartListItem.dart';
 import 'package:appprodutosestados/Models/cart.dart';
+import 'package:appprodutosestados/Models/orderList.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -43,6 +44,11 @@ class Cartpage extends StatelessWidget {
                   Spacer(),
                   ElevatedButton(
                     onPressed: () {
+                      if (cart.items.values.isNotEmpty)
+                        Provider.of<Orderlist>(
+                          context,
+                          listen: false,
+                        ).addOrder(cart);
                       cart.clear();
                     },
                     style: ElevatedButton.styleFrom(

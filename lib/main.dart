@@ -1,6 +1,8 @@
 import 'package:appprodutosestados/Models/cart.dart';
+import 'package:appprodutosestados/Models/orderList.dart';
 import 'package:appprodutosestados/Models/productList.dart';
 import 'package:appprodutosestados/Pages/cartPage.dart';
+import 'package:appprodutosestados/Pages/ordersPage.dart';
 import 'package:appprodutosestados/Pages/productDetailPage.dart';
 import 'package:appprodutosestados/Pages/productsOverviewPage.dart';
 
@@ -24,6 +26,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => ProductList()),
         ChangeNotifierProvider(create: (_) => Cart()),
+        ChangeNotifierProvider(create: (_) => Orderlist()),
       ],
       child: MaterialApp(
         title: "app Loja",
@@ -37,6 +40,7 @@ class MyApp extends StatelessWidget {
           Approutes.HOME: (ctx) => Productsoverviewpage(),
           Approutes.ITEMPRODUCT: (ctx) => Productdetailpage(),
           Approutes.CART: (ctx) => Cartpage(),
+          Approutes.ORDERS: (ctx) => Orderspage(),
         },
       ),
     );
