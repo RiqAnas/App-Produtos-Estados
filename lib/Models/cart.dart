@@ -50,24 +50,26 @@ class Cart extends ChangeNotifier {
     }
   }
 
-  void diminuteItem(CartItem cartI) {
-    if (cartI.quantity > 1) {
-      final cartItem = _items.values.firstWhere((value) => value == cartI);
-      _items.update(
-        cartItem.productId,
-        (item) => CartItem(
-          id: item.id,
-          productId: item.productId,
-          productName: item.productName,
-          price: item.price,
-          quantity: item.quantity - 1,
-        ),
-      );
+  void diminuteItem(String productId) {
+    if (_items.containsKey(productId)) {
+      if (_items[productId]!.quantity > 1) {
+        _items.update(
+          productId,
+          (item) => CartItem(
+            id: item.id,
+            productId: item.productId,
+            productName: item.productName,
+            price: item.price,
+            quantity: item.quantity - 1,
+          ),
+        );
+      } else {
+        _items.remove(_items[productId]!.productId);
+        notifyListeners();
+      }
     } else {
-      _items.remove(cartI.productId);
-      notifyListeners();
+      return;
     }
-
     notifyListeners();
   }
 

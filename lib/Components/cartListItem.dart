@@ -63,7 +63,45 @@ class Cartlistitem extends StatelessWidget {
           Text("${items!.quantity}x"),
           IconButton(
             onPressed: () {
-              Provider.of<Cart>(context, listen: false).diminuteItem(items!);
+              if (items!.quantity == 1) {
+                //mostrar um popUp de decisão
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text("Tem certeza?"),
+                    content: Text(
+                      "Quer remover ${items!.productName} do carrinho?",
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: Text(
+                          "Não",
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop(true);
+                          Provider.of<Cart>(
+                            context,
+                            listen: false,
+                          ).diminuteItem(items!.productId);
+                        },
+                        child: Text(
+                          "Sim",
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                Provider.of<Cart>(
+                  context,
+                  listen: false,
+                ).diminuteItem(items!.productId);
+              }
             },
             icon: Icon(Icons.delete, color: Colors.red),
           ),

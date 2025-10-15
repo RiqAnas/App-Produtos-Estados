@@ -35,6 +35,21 @@ class Itemproduct extends StatelessWidget {
           trailing: IconButton(
             onPressed: () {
               cart.addItem(product);
+              //consegue pegar o scaffold mais próximo do componente
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("${product.title} Adicionado!"),
+                  duration: Duration(seconds: 2),
+                  action: SnackBarAction(
+                    label: "Desfazer",
+                    onPressed: () {
+                      cart.diminuteItem(product.id!);
+                    },
+                    textColor: Theme.of(context).primaryColor,
+                  ),
+                ),
+              );
             },
             icon: Icon(Icons.shopping_cart),
           ),

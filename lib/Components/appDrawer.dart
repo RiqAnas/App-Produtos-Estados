@@ -26,6 +26,12 @@ class Appdrawer extends StatelessWidget {
             onTap: () =>
                 Navigator.of(context).pushReplacementNamed(Approutes.ORDERS),
           ),
+          ListTile(
+            leading: Icon(Icons.edit),
+            title: Text("Editar Produtos"),
+            onTap: () =>
+                Navigator.of(context).pushReplacementNamed(Approutes.EDITOR),
+          ),
         ],
       ),
     );
