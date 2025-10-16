@@ -2,6 +2,7 @@ import 'package:appprodutosestados/Components/appDrawer.dart';
 import 'package:appprodutosestados/Components/productsGrid.dart';
 import 'package:appprodutosestados/Components/quantBadge.dart';
 import 'package:appprodutosestados/Models/cart.dart';
+import 'package:appprodutosestados/Models/productList.dart';
 import 'package:appprodutosestados/Utils/appRoutes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +16,18 @@ class Productsoverviewpage extends StatefulWidget {
 
 class _ProductsoverviewpageState extends State<Productsoverviewpage> {
   bool _showFavoriteOnly = false;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<ProductList>(context, listen: false).loadProducts().then((_) {
+      setState(() {
+        _isLoading = false;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,7 +70,13 @@ class _ProductsoverviewpageState extends State<Productsoverviewpage> {
         centerTitle: true,
         backgroundColor: Theme.of(context).primaryColor,
       ),
-      body: productsGrid(favoriteOnly: _showFavoriteOnly),
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(
+                color: Theme.of(context).primaryColor,
+              ),
+            )
+          : productsGrid(favoriteOnly: _showFavoriteOnly),
       drawer: Appdrawer(),
     );
   }

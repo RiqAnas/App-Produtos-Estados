@@ -85,7 +85,7 @@ class _ProductformpageState extends State<Productformpage> {
   }
 
   //método de enviar formulário ---------------------------------
-  void _submitForm() {
+  Future<void> _submitForm() async {
     final isValid = _formKey.currentState!.validate();
     if (!isValid) {
       return;
@@ -98,22 +98,21 @@ class _ProductformpageState extends State<Productformpage> {
     });
 
     //provider precisa ser listen=false pois está fora do método Build
-    Provider.of<ProductList>(
-          context,
-          listen: false,
-          //o then ocorre depois de todos os then setados na classe de onde está o future
-        )
-        .saveProduct(_formData)
-        .catchError((error) {
-          return showDialog<void>(
-            context: context,
-            builder: (context) => _errorAlert(),
-          );
-        })
-        .then((value) {
-          setState(() => _isLoading = false);
-          Navigator.of(context).pop();
-        });
+    try {
+      await Provider.of<ProductList>(
+        context,
+        listen: false,
+        //o then ocorre depois de todos os then setados na classe de onde está o future
+      ).saveProduct(_formData);
+      Navigator.of(context).pop();
+    } catch (error) {
+      await showDialog<void>(
+        context: context,
+        builder: (context) => _errorAlert(),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
   //---------------------------------------------------------------
 
