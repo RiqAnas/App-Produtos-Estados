@@ -1,10 +1,13 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:appprodutosestados/Data/dummyData.dart';
 import 'package:appprodutosestados/Models/product.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class ProductList with ChangeNotifier {
+  final _baseUrl = 'https://teste-shop-1977f-default-rtdb.firebaseio.com/';
   List<Product> _items = DummyProducts;
 
   List<Product> get items => [..._items];
@@ -15,7 +18,7 @@ class ProductList with ChangeNotifier {
     return _items.length;
   }
 
-  void saveProduct(Map<String, Object> data) {
+  Future<void> saveProduct(Map<String, Object> data) {
     bool hasId = data['id'] != null;
 
     final product = Product(
@@ -28,15 +31,13 @@ class ProductList with ChangeNotifier {
       imageUrl: data['url'] as String,
     );
     if (hasId) {
-      updateProduct(product);
+      return updateProduct(product);
     } else {
-      addProduct(product);
+      return addProduct(product);
     }
-
-    notifyListeners();
   }
 
-  void updateProduct(Product product) {
+  Future<void> updateProduct(Product product) {
     //sempre volta um valor de indíce e por padrão se for -1 é inválido
     int index = _items.indexWhere((pr) => pr.id == product.id);
     //substitui o produto do deteminado index pelo produto atualizado
@@ -44,12 +45,38 @@ class ProductList with ChangeNotifier {
       _items[index] = product;
       notifyListeners();
     }
+
+    return Future.value();
   }
 
-  void addProduct(Product product) {
-    _items.add(product);
-    //atualiza os interessados que utilizarão a lista, gerando a atualização da calsse
-    notifyListeners();
+  Future<void> addProduct(Product product) {
+    final future = http.post(
+      //convenção do fireBase colocar .json no final da Url
+      Uri.parse('$_baseUrl/products.json'),
+      body: jsonEncode(<String, Object>{
+        "name": product.title as String,
+        "description": product.description as String,
+        "price": product.price as double,
+        "imageUrl": product.imageUrl as String,
+        "isFavorite": product.isFavorite as bool,
+      }),
+    );
+    //retorna o .then da operação de adicionar ao banco, que é a que adiciona o produto localmente
+    return future.then<void>((response) {
+      //pode colocar para executar um código apenas quando a resposta for processada
+      final id = jsonDecode(response.body)['name'];
+      _items.add(
+        Product(
+          id: id,
+          title: product.title,
+          description: product.description,
+          price: product.price,
+          imageUrl: product.imageUrl,
+        ),
+      );
+      //atualiza os interessados que utilizarão a lista, gerando a atualização da classe
+      notifyListeners();
+    });
   }
 
   void deleteProduct(Product product) {
