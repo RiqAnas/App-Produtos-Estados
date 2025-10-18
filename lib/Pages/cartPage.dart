@@ -42,26 +42,7 @@ class Cartpage extends StatelessWidget {
                   ),
                   //pra tirar o espaço entre o do meio e o do final
                   Spacer(),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (cart.items.values.isNotEmpty)
-                        Provider.of<Orderlist>(
-                          context,
-                          listen: false,
-                        ).addOrder(cart);
-                      cart.clear();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor,
-                      shape: ContinuousRectangleBorder(
-                        borderRadius: BorderRadiusGeometry.circular(15),
-                      ),
-                    ),
-                    child: Text(
-                      "Finalizar compra",
-                      style: TextStyle(color: Colors.black, fontSize: 12),
-                    ),
-                  ),
+                  cartButton(cart: cart),
                 ],
               ),
             ),
@@ -76,5 +57,54 @@ class Cartpage extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class cartButton extends StatefulWidget {
+  const cartButton({super.key, required this.cart});
+
+  final Cart cart;
+
+  @override
+  State<cartButton> createState() => _cartButtonState();
+}
+
+class _cartButtonState extends State<cartButton> {
+  bool _isLoading = false;
+  @override
+  Widget build(BuildContext context) {
+    return _isLoading
+        ? Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: CircularProgressIndicator(
+              color: Theme.of(context).primaryColor,
+            ),
+          )
+        : ElevatedButton(
+            onPressed: widget.cart.itemsCount == 0
+                ? null
+                : () async {
+                    setState(() => _isLoading = true);
+                    await Provider.of<Orderlist>(
+                      context,
+                      listen: false,
+                    ).addOrder(widget.cart).then((_) {});
+
+                    widget.cart.clear();
+                    setState(() {
+                      _isLoading = false;
+                    });
+                  },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).primaryColor,
+              shape: ContinuousRectangleBorder(
+                borderRadius: BorderRadiusGeometry.circular(15),
+              ),
+            ),
+            child: Text(
+              "Finalizar compra",
+              style: TextStyle(color: Colors.black, fontSize: 12),
+            ),
+          );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:appprodutosestados/Models/product.dart';
 import 'package:appprodutosestados/Models/productList.dart';
 import 'package:appprodutosestados/Utils/appRoutes.dart';
+import 'package:appprodutosestados/exceptions/httpException.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,6 +12,7 @@ class Producteditoritem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final msg = ScaffoldMessenger.of(context);
     // TODO: implement build
     return Card(
       child: ListTile(
@@ -52,10 +54,6 @@ class Producteditoritem extends StatelessWidget {
                         TextButton(
                           onPressed: () {
                             Navigator.of(context).pop(true);
-                            Provider.of<ProductList>(
-                              context,
-                              listen: false,
-                            ).deleteProduct(product);
                           },
                           child: Text(
                             "Sim",
@@ -64,7 +62,22 @@ class Producteditoritem extends StatelessWidget {
                         ),
                       ],
                     ),
-                  );
+                  ).then((value) async {
+                    //se identificar que o valor selecionado não é falso (no caso ao clicar sim no
+                    //alertDialog)
+                    if (value ?? false) {
+                      try {
+                        await Provider.of<ProductList>(
+                          context,
+                          listen: false,
+                        ).deleteProduct(product);
+                      } on Httpexception catch (error) {
+                        msg.showSnackBar(
+                          SnackBar(content: Text(error.toString())),
+                        );
+                      }
+                    }
+                  });
                 },
                 icon: Icon(Icons.delete, color: Colors.red),
               ),

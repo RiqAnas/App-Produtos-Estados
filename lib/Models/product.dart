@@ -1,6 +1,12 @@
+import 'dart:convert';
+
+import 'package:appprodutosestados/Utils/constants.dart';
+import 'package:appprodutosestados/exceptions/httpException.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class Product with ChangeNotifier {
+  final _baseUrl = Constants.BASEURL;
   final String? id;
   final String? title;
   final String? description;
@@ -17,8 +23,25 @@ class Product with ChangeNotifier {
     this.isFavorite = false,
   });
 
-  void toggleFavorite() {
+  void _changeFavorite() {
     isFavorite = !isFavorite!;
     notifyListeners();
+  }
+
+  Future<void> toggleFavorite() async {
+    _changeFavorite();
+
+    final response = await http.patch(
+      Uri.parse("$_baseUrl/$id.json"),
+      body: jsonEncode({"isFavorite": isFavorite}),
+    );
+
+    if (response.statusCode >= 400) {
+      _changeFavorite();
+      throw Httpexception(
+        statusCode: response.statusCode,
+        msg: "Houve um erro ao tentar alterar status de favorito.",
+      );
+    }
   }
 }

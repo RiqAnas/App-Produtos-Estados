@@ -13,6 +13,7 @@ class Itemproduct extends StatelessWidget {
 
     final product = Provider.of<Product>(context, listen: false);
     final cart = Provider.of<Cart>(context, listen: false);
+    final msg = ScaffoldMessenger.of(context);
 
     return ClipRRect(
       borderRadius: BorderRadiusGeometry.circular(10),
@@ -23,8 +24,17 @@ class Itemproduct extends StatelessWidget {
           //há essa opção ao invés do provider, é útil para aplica-lo únicamente no lugar da mudança
           leading: Consumer<Product>(
             builder: (context, product, child) => IconButton(
-              onPressed: () {
-                product.toggleFavorite();
+              onPressed: () async {
+                try {
+                  await product.toggleFavorite();
+                } catch (error) {
+                  msg.showSnackBar(
+                    SnackBar(
+                      content: Text(error.toString()),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
               },
               icon: Icon(
                 Icons.favorite,

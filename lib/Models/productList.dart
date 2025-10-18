@@ -2,12 +2,13 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:appprodutosestados/Models/product.dart';
+import 'package:appprodutosestados/Utils/constants.dart';
+import 'package:appprodutosestados/exceptions/httpException.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class ProductList with ChangeNotifier {
-  final _baseUrl =
-      'https://teste-shop-1977f-default-rtdb.firebaseio.com/products';
+  final _baseUrl = Constants.BASEURL;
   List<Product> _items = [];
 
   List<Product> get items => [..._items];
@@ -108,11 +109,25 @@ class ProductList with ChangeNotifier {
     notifyListeners();
   }
 
-  void deleteProduct(Product product) {
+  Future<void> deleteProduct(Product product) async {
     int nIndex = _items.indexWhere((pr) => pr.id == product.id);
     if (nIndex >= 0) {
       _items.remove(_items[nIndex]);
       notifyListeners();
+      //nesse caso se exclui pro usuário enquanto nos bastidores se exclui no banco
+      final response = await http.delete(
+        Uri.parse("$_baseUrl/${product.id}.json"),
+      );
+
+      //400 = lado do cliente, 500 = lado do servidor
+      if (response.statusCode >= 400) {
+        _items.insert(nIndex, product);
+        notifyListeners();
+        throw Httpexception(
+          statusCode: response.statusCode,
+          msg: "Não foi possível excluir o produto",
+        );
+      }
     }
   }
 
