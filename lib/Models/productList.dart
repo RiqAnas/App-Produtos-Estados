@@ -9,7 +9,11 @@ import 'package:http/http.dart' as http;
 
 class ProductList with ChangeNotifier {
   final _baseUrl = Constants.BASEURL;
+  final String _token;
   List<Product> _items = [];
+  String _userId;
+
+  ProductList([this._token = '', this._items = const [], this._userId = '']);
 
   List<Product> get items => [..._items];
   List<Product> get favoriteItems =>
@@ -21,9 +25,21 @@ class ProductList with ChangeNotifier {
 
   Future<void> loadProducts() async {
     _items.clear();
-    final response = await http.get(Uri.parse("$_baseUrl.json"));
+    final response = await http.get(Uri.parse("$_baseUrl.json?auth=$_token"));
+
+    if (response.body == 'null') return;
+
+    final favResponse = await http.get(
+      Uri.parse("${Constants.USERFAVORITEURL}/$_userId.json?auth=$_token"),
+    );
+
+    Map<String, dynamic> favData = favResponse.body == 'null'
+        ? {}
+        : json.decode(favResponse.body);
+
     Map<String, dynamic> data = jsonDecode(response.body);
     data.forEach((productId, productData) {
+      final isFavorite = favData[productId] ?? false;
       _items.add(
         Product(
           id: productId,
@@ -31,7 +47,7 @@ class ProductList with ChangeNotifier {
           description: productData["description"],
           price: productData["price"],
           imageUrl: productData["imageUrl"],
-          isFavorite: productData["isFavorite"],
+          isFavorite: isFavorite,
         ),
       );
     });
@@ -63,7 +79,7 @@ class ProductList with ChangeNotifier {
     //substitui o produto do deteminado index pelo produto atualizado
     if (index >= 0) {
       await http.patch(
-        Uri.parse("$_baseUrl/${product.id}.json"),
+        Uri.parse("$_baseUrl/${product.id}.json?auth=$_token"),
         body: jsonEncode({
           "name": product.title,
           "description": product.description,
@@ -84,13 +100,12 @@ class ProductList with ChangeNotifier {
     //faz com que se espere pelo valor do future e passe ele pra a resposta
     final response = await http.post(
       //convenção do fireBase colocar .json no final da Url
-      Uri.parse("$_baseUrl.json"),
+      Uri.parse("$_baseUrl.json?auth=$_token"),
       body: jsonEncode(<String, Object>{
         "name": product.title as String,
         "description": product.description as String,
         "price": product.price as double,
         "imageUrl": product.imageUrl as String,
-        "isFavorite": product.isFavorite as bool,
       }),
     );
     //retorna o .then da operação de adicionar ao banco, que é a que adiciona o produto localmente
@@ -116,7 +131,7 @@ class ProductList with ChangeNotifier {
       notifyListeners();
       //nesse caso se exclui pro usuário enquanto nos bastidores se exclui no banco
       final response = await http.delete(
-        Uri.parse("$_baseUrl/${product.id}.json"),
+        Uri.parse("$_baseUrl/${product.id}.json?auth=$_token"),
       );
 
       //400 = lado do cliente, 500 = lado do servidor

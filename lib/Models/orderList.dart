@@ -10,6 +10,10 @@ import 'package:http/http.dart' as http;
 class Orderlist extends ChangeNotifier {
   final _baseUrl = Constants.BASEURLORDER;
   List<Order> _items = [];
+  final String _token;
+  final String _userId;
+
+  Orderlist([this._token = '', this._items = const [], this._userId = '']);
 
   List<Order> get items {
     return [..._items];
@@ -21,7 +25,9 @@ class Orderlist extends ChangeNotifier {
 
   Future<void> loadOrder() async {
     _items.clear();
-    final response = await http.get(Uri.parse("$_baseUrl.json"));
+    final response = await http.get(
+      Uri.parse("$_baseUrl/$_userId.json?auth=$_token"),
+    );
     Map<String, dynamic> data = jsonDecode(response.body);
     data.forEach((orderId, orderValue) {
       _items.add(
@@ -48,7 +54,7 @@ class Orderlist extends ChangeNotifier {
   Future<void> addOrder(Cart cart) async {
     final date = DateTime.now();
     final response = await http.post(
-      Uri.parse("$_baseUrl.json"),
+      Uri.parse("$_baseUrl/$_userId.json?auth=$_token"),
       body: jsonEncode(<String, Object>{
         'total': cart.totalAmount,
         'date': date.toIso8601String(),

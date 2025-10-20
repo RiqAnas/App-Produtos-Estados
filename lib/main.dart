@@ -3,13 +3,11 @@ import 'package:appprodutosestados/Models/cart.dart';
 import 'package:appprodutosestados/Models/orderList.dart';
 import 'package:appprodutosestados/Models/productList.dart';
 import 'package:appprodutosestados/Pages/authOrHomePage.dart';
-import 'package:appprodutosestados/Pages/authPage.dart';
 import 'package:appprodutosestados/Pages/cartPage.dart';
 import 'package:appprodutosestados/Pages/ordersPage.dart';
 import 'package:appprodutosestados/Pages/productDetailPage.dart';
 import 'package:appprodutosestados/Pages/productEditorPage.dart';
 import 'package:appprodutosestados/Pages/productFormPage.dart';
-import 'package:appprodutosestados/Pages/productsOverviewPage.dart';
 
 import 'package:appprodutosestados/Utils/appRoutes.dart';
 import 'package:flutter/material.dart';
@@ -29,10 +27,30 @@ class MyApp extends StatelessWidget {
     //criando e passando uma nova classe
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ProductList()),
-        ChangeNotifierProvider(create: (_) => Cart()),
-        ChangeNotifierProvider(create: (_) => Orderlist()),
         ChangeNotifierProvider(create: (_) => Auth()),
+        //por padrão esse só depende de um provider, mas colocando um número na frente do Provider se pode
+        //aumentar
+        ChangeNotifierProxyProvider<Auth, ProductList>(
+          create: (_) => ProductList(),
+          update: (context, auth, previous) {
+            return ProductList(
+              auth.token ?? '',
+              previous?.items ?? [],
+              auth.uid ?? '',
+            );
+          },
+        ),
+        ChangeNotifierProxyProvider<Auth, Orderlist>(
+          create: (_) => Orderlist(),
+          update: (context, auth, previous) {
+            return Orderlist(
+              auth.token ?? '',
+              previous?.items ?? [],
+              auth.uid ?? '',
+            );
+          },
+        ),
+        ChangeNotifierProvider(create: (_) => Cart()),
       ],
       child: MaterialApp(
         title: "app Loja",

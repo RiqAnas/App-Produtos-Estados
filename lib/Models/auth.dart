@@ -1,18 +1,20 @@
 import 'dart:convert';
 
+import 'package:appprodutosestados/Utils/constants.dart';
 import 'package:appprodutosestados/exceptions/authException.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class Auth with ChangeNotifier {
+  String key = Constants.KEY;
   String? _token;
   String? _email;
   String? _uid;
   DateTime? _expiryDate;
 
   bool get isAuth {
-    final isValid = _expiryDate!.isAfter(DateTime.now());
-    return _token != null && isValid;
+    final isValid = _expiryDate?.isAfter(DateTime.now());
+    return _token != null && isValid!;
   }
 
   String? get token {
@@ -29,7 +31,7 @@ class Auth with ChangeNotifier {
 
   Future<void> authenticate(String email, String password, String frag) async {
     final String _url =
-        'https://identitytoolkit.googleapis.com/v1/accounts:$frag?key=AIzaSyC4ZwD_GnYmggfZlpvWOVg_VlWnB_m-0qs';
+        'https://identitytoolkit.googleapis.com/v1/accounts:$frag?key=$key';
     final response = await http.post(
       Uri.parse(_url),
       body: jsonEncode({
@@ -46,7 +48,7 @@ class Auth with ChangeNotifier {
     } else {
       _token = body['idToken'];
       _email = body['email'];
-      _uid = body['localid'];
+      _uid = body['localId'];
 
       _expiryDate = DateTime.now().add(
         Duration(seconds: int.parse(body['expiresIn'])),
@@ -61,5 +63,13 @@ class Auth with ChangeNotifier {
 
   Future<void> login(String email, String password) async {
     return authenticate(email, password, 'signInWithPassword');
+  }
+
+  void logout() {
+    _token = null;
+    _email = null;
+    _uid = null;
+    _expiryDate = null;
+    notifyListeners();
   }
 }

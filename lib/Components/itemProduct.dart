@@ -1,3 +1,4 @@
+import 'package:appprodutosestados/Models/auth.dart';
 import 'package:appprodutosestados/Models/cart.dart';
 import 'package:appprodutosestados/Models/product.dart';
 import 'package:appprodutosestados/Utils/appRoutes.dart';
@@ -13,6 +14,7 @@ class Itemproduct extends StatelessWidget {
 
     final product = Provider.of<Product>(context, listen: false);
     final cart = Provider.of<Cart>(context, listen: false);
+    final auth = Provider.of<Auth>(context, listen: false);
     final msg = ScaffoldMessenger.of(context);
 
     return ClipRRect(
@@ -26,7 +28,10 @@ class Itemproduct extends StatelessWidget {
             builder: (context, product, child) => IconButton(
               onPressed: () async {
                 try {
-                  await product.toggleFavorite();
+                  await product.toggleFavorite(
+                    auth.token ?? '',
+                    auth.uid ?? '',
+                  );
                 } catch (error) {
                   msg.showSnackBar(
                     SnackBar(

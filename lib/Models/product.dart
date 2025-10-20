@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class Product with ChangeNotifier {
-  final _baseUrl = Constants.BASEURL;
+  final _baseUrl = Constants.USERFAVORITEURL;
   final String? id;
   final String? title;
   final String? description;
@@ -28,12 +28,12 @@ class Product with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> toggleFavorite() async {
+  Future<void> toggleFavorite(String token, String userId) async {
     _changeFavorite();
 
-    final response = await http.patch(
-      Uri.parse("$_baseUrl/$id.json"),
-      body: jsonEncode({"isFavorite": isFavorite}),
+    final response = await http.put(
+      Uri.parse("$_baseUrl/$userId/$id.json?auth=$token"),
+      body: jsonEncode(isFavorite),
     );
 
     if (response.statusCode >= 400) {

@@ -1,5 +1,7 @@
+import 'package:appprodutosestados/Models/auth.dart';
 import 'package:appprodutosestados/Utils/appRoutes.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Appdrawer extends StatelessWidget {
   @override
@@ -32,6 +34,17 @@ class Appdrawer extends StatelessWidget {
             title: Text("Editar Produtos"),
             onTap: () =>
                 Navigator.of(context).pushReplacementNamed(Approutes.EDITOR),
+          ),
+          SizedBox(height: 400),
+          ListTile(
+            leading: Icon(Icons.exit_to_app),
+            title: Text("Sair"),
+            onTap: () {
+              Provider.of<Auth>(context, listen: false).logout();
+              Navigator.of(
+                context,
+              ).pushReplacementNamed(Approutes.AUTHORHOMEPAGE);
+            },
           ),
         ],
       ),

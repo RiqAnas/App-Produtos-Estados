@@ -36,7 +36,10 @@ class _AuthformState extends State<Authform> {
         actions: [
           TextButton(
             onPressed: Navigator.of(context).pop,
-            child: Text("Fechar"),
+            child: Text(
+              "Fechar",
+              style: TextStyle(color: Theme.of(context).primaryColor),
+            ),
           ),
         ],
       ),
@@ -55,6 +58,7 @@ class _AuthformState extends State<Authform> {
 
   Map<String, String> _authData = {'email': '', 'password': ''};
 
+  //método para login ou cadastro
   Future<void> _submit() async {
     final _isValid = _formKey.currentState?.validate() ?? false;
 
