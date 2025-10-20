@@ -17,8 +17,9 @@ class Appdrawer extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.shopping_bag_rounded),
             title: Text("Shopping"),
-            onTap: () =>
-                Navigator.of(context).pushReplacementNamed(Approutes.HOME),
+            onTap: () => Navigator.of(
+              context,
+            ).pushReplacementNamed(Approutes.AUTHORHOMEPAGE),
           ),
           ListTile(
             leading: Icon(Icons.view_list_rounded),

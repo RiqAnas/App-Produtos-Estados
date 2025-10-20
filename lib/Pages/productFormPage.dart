@@ -1,3 +1,4 @@
+import 'package:appprodutosestados/Components/formFieldDecoration.dart';
 import 'package:appprodutosestados/Models/product.dart';
 import 'package:appprodutosestados/Models/productList.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,11 @@ class _ProductformpageState extends State<Productformpage> {
   final _formData = Map<String, Object>();
 
   bool _isLoading = false;
+
+  bool _nameError = false;
+  bool _priceError = false;
+  bool _descriptionError = false;
+  bool _urlError = false;
 
   @override
   void initState() {
@@ -118,20 +124,6 @@ class _ProductformpageState extends State<Productformpage> {
 
   @override
   Widget build(BuildContext context) {
-    Widget _formFieldDecoration({required Widget child}) {
-      return Padding(
-        padding: EdgeInsetsGeometry.symmetric(vertical: 8),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            border: BoxBorder.all(color: Colors.grey, width: 2),
-          ),
-          child: child,
-          padding: EdgeInsets.symmetric(horizontal: 5),
-        ),
-      );
-    }
-
     //------------------------------------------------------//
 
     return Scaffold(
@@ -158,7 +150,8 @@ class _ProductformpageState extends State<Productformpage> {
                 child: ListView(
                   children: [
                     //Nome
-                    _formFieldDecoration(
+                    Formfielddecoration(
+                      error: _nameError,
                       child: TextFormField(
                         initialValue: _formData['name']?.toString(),
                         decoration: InputDecoration(
@@ -175,20 +168,27 @@ class _ProductformpageState extends State<Productformpage> {
                         //exibida em caso de erro
                         validator: (_name) {
                           final name = _name ?? '';
+                          bool error = false;
+                          String? errormsg;
                           if (name.trim().isEmpty) {
-                            return 'Nome é obrigatório';
+                            error = true;
+                            errormsg = 'Nome é obrigatório';
+                          } else if (name.trim().length < 3) {
+                            error = true;
+                            errormsg = 'Nome precisa de no mínimo 3 letras.';
                           }
 
-                          if (name.trim().length < 3) {
-                            return 'Nome precisa de no mínimo 3 letras.';
-                          }
-                          return null;
+                          setState(() {
+                            _nameError = error;
+                          });
+                          return errormsg;
                         },
                       ),
                     ),
 
                     //Preço
-                    _formFieldDecoration(
+                    Formfielddecoration(
+                      error: _priceError,
                       child: TextFormField(
                         initialValue: _formData['price']?.toString(),
                         decoration: InputDecoration(
@@ -210,17 +210,23 @@ class _ProductformpageState extends State<Productformpage> {
                         validator: (_price) {
                           final priceString = _price ?? '-1';
                           final price = double.tryParse(priceString) ?? -1;
-
+                          bool error = false;
+                          String? errormsg;
                           if (price <= 0) {
-                            return "Informe um preço válido";
+                            error = true;
+                            errormsg = "Informe um preço válido";
                           }
-                          return null;
+                          setState(() {
+                            _priceError = error;
+                          });
+                          return errormsg;
                         },
                       ),
                     ),
 
                     //Descrição
-                    _formFieldDecoration(
+                    Formfielddecoration(
+                      error: _descriptionError,
                       child: TextFormField(
                         initialValue: _formData['description']?.toString(),
                         decoration: InputDecoration(
@@ -235,14 +241,22 @@ class _ProductformpageState extends State<Productformpage> {
                             _formData['description'] = descricao!,
                         validator: (_description) {
                           final description = _description ?? '';
+                          bool error = false;
+                          String? errormsg;
                           if (description.trim().isEmpty) {
-                            return 'Descrição é obrigatória';
+                            error = true;
+                            errormsg = 'Descrição é obrigatória';
+                          } else if (description.trim().length < 10) {
+                            error = true;
+                            errormsg =
+                                'Descrição precisa de no mínimo 10 letras.';
                           }
 
-                          if (description.trim().length < 10) {
-                            return 'Descrição precisa de no mínimo 10 letras.';
-                          }
-                          return null;
+                          setState(() {
+                            _descriptionError = error;
+                          });
+
+                          return errormsg;
                         },
                       ),
                     ),
@@ -253,7 +267,8 @@ class _ProductformpageState extends State<Productformpage> {
                       spacing: 10,
                       children: [
                         Expanded(
-                          child: _formFieldDecoration(
+                          child: Formfielddecoration(
+                            error: _urlError,
                             child: TextFormField(
                               decoration: InputDecoration(
                                 labelText: "Url da imagem",
@@ -267,11 +282,18 @@ class _ProductformpageState extends State<Productformpage> {
                               onSaved: (url) => _formData['url'] = url!,
                               validator: (_url) {
                                 final url = _url ?? '';
-
+                                bool error = false;
+                                String? errormsg;
                                 if (!isValidUrl(url)) {
-                                  return "Insira uma url válida";
+                                  error = true;
+                                  errormsg = "Insira uma url válida";
                                 }
-                                return null;
+
+                                setState(() {
+                                  _urlError = error;
+                                });
+
+                                return errormsg;
                               },
                             ),
                           ),
