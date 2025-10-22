@@ -10,6 +10,7 @@ import 'package:appprodutosestados/Pages/productEditorPage.dart';
 import 'package:appprodutosestados/Pages/productFormPage.dart';
 
 import 'package:appprodutosestados/Utils/appRoutes.dart';
+import 'package:appprodutosestados/Utils/customRoute.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -57,6 +58,9 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           textTheme: GoogleFonts.alexandriaTextTheme(),
           primaryColor: Colors.amber,
+          pageTransitionsTheme: PageTransitionsTheme(
+            builders: {TargetPlatform.android: CustomPageTransitionBuilder()},
+          ),
         ),
         debugShowCheckedModeBanner: false,
         initialRoute: '/',

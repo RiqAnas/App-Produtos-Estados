@@ -15,34 +15,39 @@ class _OrderlisttileState extends State<Orderlisttile> {
   bool _expanded = false;
   @override
   Widget build(BuildContext context) {
+    final widgetHeight = (widget.order.products!.length * 60.0) + 30.0;
     // TODO: implement build
-    return Card(
-      child: Column(
-        children: [
-          ListTile(
-            isThreeLine: true,
-            title: Text(
-              "Pedido #${widget.order.id.toString().substring(3, 8)}",
-            ),
-            subtitle: Text(
-              "${DateFormat('dd/MM/yyyy hh:mm').format(widget.order.date!)}\nR\$ ${widget.order.total!.toStringAsFixed(2)}",
-            ),
-            trailing: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 15.0),
-              child: IconButton(
-                onPressed: () {
-                  setState(() {
-                    _expanded = !_expanded;
-                  });
-                },
-                icon: Icon(Icons.expand_more, color: Colors.black),
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 300),
+      height: _expanded ? widgetHeight + 120 : 100,
+      child: Card(
+        elevation: 2,
+        child: Column(
+          children: [
+            ListTile(
+              isThreeLine: true,
+              title: Text(
+                "Pedido #${widget.order.id.toString().substring(3, 8)}",
+              ),
+              subtitle: Text(
+                "${DateFormat('dd/MM/yyyy hh:mm').format(widget.order.date!)}\nR\$ ${widget.order.total!.toStringAsFixed(2)}",
+              ),
+              trailing: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 15.0),
+                child: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _expanded = !_expanded;
+                    });
+                  },
+                  icon: Icon(Icons.expand_more, color: Colors.black),
+                ),
               ),
             ),
-          ),
-          if (_expanded)
-            Container(
+            AnimatedContainer(
+              duration: Duration(milliseconds: 300),
               padding: EdgeInsets.symmetric(vertical: 15),
-              height: 200,
+              height: _expanded ? widgetHeight : 0,
               child: ListView(
                 children: widget.order.products!.map((product) {
                   return Padding(
@@ -77,7 +82,8 @@ class _OrderlisttileState extends State<Orderlisttile> {
                 }).toList(),
               ),
             ),
-        ],
+          ],
+        ),
       ),
     );
   }

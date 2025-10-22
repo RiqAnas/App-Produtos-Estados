@@ -75,8 +75,11 @@ class Itemproduct extends StatelessWidget {
               context,
             ).pushNamed(Approutes.ITEMPRODUCT, arguments: product);
           },
-          child: Image.network(product.imageUrl.toString(), fit: BoxFit.cover),
-        ),
+          child: Hero(
+            tag: product.id!,
+            child: Image.network(product.imageUrl!, fit: BoxFit.cover),
+          ),
+        ), //Image.network(product.imageUrl.toString(), fit: BoxFit.cover),
       ),
     );
   }
