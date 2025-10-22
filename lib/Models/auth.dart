@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 
+import 'package:appprodutosestados/Data/store.dart';
 import 'package:appprodutosestados/Utils/constants.dart';
 import 'package:appprodutosestados/exceptions/authException.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +13,7 @@ class Auth with ChangeNotifier {
   String? _email;
   String? _uid;
   DateTime? _expiryDate;
+  Timer? _logoutTimer;
 
   bool get isAuth {
     final isValid = _expiryDate?.isAfter(DateTime.now());
@@ -53,6 +56,16 @@ class Auth with ChangeNotifier {
       _expiryDate = DateTime.now().add(
         Duration(seconds: int.parse(body['expiresIn'])),
       );
+
+      //ao validar manda as informações para serem persistidas
+      Store.saveMap('userData', {
+        'token': _token,
+        'email': _email,
+        'localid': _uid,
+        'expiryDate': _expiryDate!.toIso8601String(),
+      });
+
+      _autoLogout();
       notifyListeners();
     }
   }
@@ -65,11 +78,44 @@ class Auth with ChangeNotifier {
     return authenticate(email, password, 'signInWithPassword');
   }
 
+  //método que tenta realizar o autoLogin
+  Future<void> tryAutoLogin() async {
+    if (isAuth) return;
+
+    final userData = await Store.getMap('userData');
+
+    if (userData.isEmpty) return;
+
+    final expiryDate = DateTime.parse(userData['expiryDate']);
+
+    if (expiryDate.isBefore(DateTime.now())) return;
+
+    _token = userData['token'];
+    _email = userData['email'];
+    _uid = userData['localId'];
+    _expiryDate = expiryDate;
+
+    _autoLogout();
+    notifyListeners();
+  }
+
   void logout() {
     _token = null;
     _email = null;
     _uid = null;
     _expiryDate = null;
-    notifyListeners();
+    _clearLogoutTimer();
+    Store.remove('userData').then((_) => notifyListeners());
+  }
+
+  void _clearLogoutTimer() {
+    _logoutTimer?.cancel();
+    _logoutTimer = null;
+  }
+
+  void _autoLogout() {
+    _clearLogoutTimer();
+    final timeRemaining = _expiryDate?.difference(DateTime.now()).inSeconds;
+    _logoutTimer = Timer(Duration(seconds: timeRemaining ?? 2), logout);
   }
 }

@@ -90,8 +90,6 @@ class ProductList with ChangeNotifier {
       _items[index] = product;
       notifyListeners();
     }
-
-    return Future.value();
   }
 
   //métodos async obrigatoriamente retornam Future
